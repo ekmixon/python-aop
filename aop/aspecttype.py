@@ -29,14 +29,16 @@ class AspectType(type):
             # Se prepara el punto donde se ejecutará el aspecto
             joinpoint_attr = getattr(cls, joinpoint)
             # Se obtienen parámetros adicionales para el aspecto
-            advise_args = () if not 'args' in kwargs else tuple(kwargs['args'])
-            advise_kwargs = {} if not 'kwargs' in kwargs else dict(kwargs['kwargs'])
+            advise_args = () if 'args' not in kwargs else tuple(kwargs['args'])
+            advise_kwargs = {} if 'kwargs' not in kwargs else dict(kwargs['kwargs'])
             # Se crea el advise
             advise = advise_class(joinpoint_attr, *advise_args, **advise_kwargs)
             # Preparamos un wrapper
             def wrapper(self, *args, **kwargs):
                 return advise(self, *args, **kwargs)
+
             setattr(cls, joinpoint, wrapper)
+
         # Añadimos el método ``pointcut`` a la clase
         classdict['pointcut'] = classmethod(pointcut)
         return type.__new__(mcs, name, bases, classdict)
